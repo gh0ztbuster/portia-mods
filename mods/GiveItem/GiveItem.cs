@@ -77,44 +77,61 @@ namespace GiveItem
             {
                 GUILayout.Label( "Item Name: ", LblWidth );
 
-                name = GUILayout.TextField( name, GUILayout.Width( 200 ) ).Trim();
-                if( ( GUILayout.Button( "Search", GUILayout.Width( 100 ) ) )
-                 || ( Input.GetKeyUp( KeyCode.Return )                     )
-                 || ( Input.GetKeyUp( KeyCode.KeypadEnter )                ) )
+                bool submit = false;
+                if( ( Event.current.type == EventType.KeyDown          )
+                 && ( ( Event.current.keyCode == KeyCode.Return      )
+                   || ( Event.current.keyCode == KeyCode.KeypadEnter ) ) )
+                    submit = true;
+
+                name = GUILayout.TextField( name, GUILayout.Width( 200 ) );
+                if( GUILayout.Button( "Search", GUILayout.Width( 100 ) ) || submit )
                 {
-                    filtName = name;
-                    if( filtName == String.Empty )
-                        items = ItemDataMgrPatches.ItemDB.AsEnumerable();
-                    else if( filtName.Substring( 0, 2 ) == "##" && filtName.Length > 2 )
+                    name = name.Trim();
+
+                    if( filtName != name )
                     {
-                        try
+                        filtName = name;
+
+                        if( ( filtName == String.Empty                   )
+                         || ( filtName.Length == 1 && filtName[0] == '*' ) )
                         {
-                            items = ItemDataMgrPatches.ItemDB.Where( item => item.Key == int.Parse( filtName.Substring( 2, filtName.Length - 1 ) ) );
+                            items = ItemDataMgrPatches.ItemDB.AsEnumerable();
+                            GiveItem.Logger.Log( "Filter=None" );
                         }
-                        catch
+                        else if( filtName.Length > 2 && filtName.Substring( 0, 2 ) == "##" )
+                        {
+                            try
+                            {
+                                int itemId = int.Parse( filtName.Substring( 2, filtName.Length - 2 ) );
+                                items = ItemDataMgrPatches.ItemDB.Where( item => item.Key == itemId );
+                                GiveItem.Logger.Log( $"Filter=ItemId, Term={itemId}" );
+                            }
+                            catch
+                            {
+                                items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.Equals( filtName, StringComparison.InvariantCultureIgnoreCase ) == true );
+                                GiveItem.Logger.Log( "Filter=Equals, Term=\"" + filtName + "\"" );
+                            }
+                        }
+                        else if( filtName[0] == '*' && filtName[filtName.Length - 1] == '*' )
+                        {
+                            items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.IndexOf( filtName.Substring( 1, filtName.Length - 2 ), StringComparison.InvariantCultureIgnoreCase ) >= 0 );
+                            GiveItem.Logger.Log( "Filter=IndexOf, Term=\"" + filtName.Substring( 1, filtName.Length - 2 ) + "\"" );
+                        }
+                        else if( filtName[0] != '*' && filtName[filtName.Length - 1] == '*' )
+                        {
+                            items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.StartsWith( filtName.Substring( 0, filtName.Length - 1 ), StringComparison.InvariantCultureIgnoreCase ) == true );
+                            GiveItem.Logger.Log( "Filter=StartsWith, Term=\"" + filtName.Substring( 0, filtName.Length - 1 ) + "\"" );
+                        }
+                        else if( filtName[0] == '*' && filtName[filtName.Length - 1] != '*' )
+                        {
+                            items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.EndsWith( filtName.Substring( 1 ), StringComparison.InvariantCultureIgnoreCase ) == true );
+                            GiveItem.Logger.Log( "Filter=EndsWith, Term=\"" + filtName.Substring( 1 ) + "\"" );
+                        }
+                        else
                         {
                             items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.Equals( filtName, StringComparison.InvariantCultureIgnoreCase ) == true );
+                            GiveItem.Logger.Log( "Filter=Equals, Term=\"" + filtName + "\"" );
                         }
-                    }
-                    else if( filtName[0] == '*' && filtName[filtName.Length - 1] == '*' )
-                    {
-                        items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.IndexOf( filtName.Substring( 1, filtName.Length - 2 ), StringComparison.InvariantCultureIgnoreCase ) >= 0 );
-                        GiveItem.Logger.Log( "Filter=IndexOf, Term=\"" + filtName.Substring( 1, filtName.Length - 2 ) + "\"" );
-                    }
-                    else if( filtName[0] != '*' && filtName[filtName.Length - 1] == '*' )
-                    {
-                        items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.StartsWith( filtName.Substring( 0, filtName.Length - 1 ), StringComparison.InvariantCultureIgnoreCase ) == true );
-                        GiveItem.Logger.Log( "Filter=StartsWith, Term=\"" + filtName.Substring( 0, filtName.Length - 1 ) + "\"" );
-                    }
-                    else if( filtName[0] == '*' && filtName[filtName.Length - 1] != '*' )
-                    {
-                        items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.EndsWith( filtName.Substring( 1 ), StringComparison.InvariantCultureIgnoreCase ) == true );
-                        GiveItem.Logger.Log( "Filter=EndsWith, Term=\"" + filtName.Substring( 1 ) + "\"" );
-                    }
-                    else
-                    {
-                        items = ItemDataMgrPatches.ItemDB.Where( item => item.Value?.Equals( filtName, StringComparison.InvariantCultureIgnoreCase ) == true );
-                        GiveItem.Logger.Log( "Filter=Equals, Term=\"" + filtName + "\"" );
                     }
                 }
             }
