@@ -6,5 +6,5 @@
   "ManagerVersion": "0.13.0.0",
   "EntryMethod": "GiveItem.GiveItem.Load",
   "HomePage": "https://github.com/1bakedpotato/portia-mods",
-  "Repository_TODO": "Add github link?"
+  "Repository": "https://raw.githubusercontent.com/1bakedpotato/portia-mods/master/mods/repository.json"
 }
