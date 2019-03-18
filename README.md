@@ -12,12 +12,12 @@ NOTE: For now, this mod utilizes UnityModManager's UI. Sorry, it was a quick-and
 1. Click the settings icon next to **Give Item**
 1. Search for an item
   * Wildcards are supported
-    ** Enter `wood*` to search for items beginning with `wood`
-    ** Enter `*sofa` for items ending with `sofa`
-    ** Enter `*iron*` for words containing `iron` anywhere
+    * Enter `wood*` to search for items beginning with `wood`
+    * Enter `*sofa` for items ending with `sofa`
+    * Enter `*iron*` for words containing `iron` anywhere
   * Item IDs are supported
-    ** Prepend the integer item ID with two # characters
-    *** e.g. "##1234" searches for an item with ID 1234
+    * Prepend the integer item ID with two # characters
+      * e.g. "##1234" searches for an item with ID 1234
 1. Adjust the quantity as desired
   * Max is 100, but the item button can be clicked multiple times without closing the UI
   * Use the slider or directly enter the number in the text field next to it
