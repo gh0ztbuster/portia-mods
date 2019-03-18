@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <GameDir>F:\Games\My Time at Portia</GameDir>
+    <GameDataDirName>Portia_Data</GameDataDirName>
+    <GameManagedDir>$(GameDir)\$(GameDataDirName)\Managed</GameManagedDir>
+    <TargetAssemblyNoExt>Assembly-CSharp</TargetAssemblyNoExt>
+  </PropertyGroup>
+
+</Project>

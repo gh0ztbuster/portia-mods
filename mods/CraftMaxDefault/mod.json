@@ -1,0 +1,9 @@
+﻿{
+  "DisplayName": "CraftMaxDefault",
+  "Author": "A Baked Potato",
+  "Version": "1.0.0",
+  "Enable": true,
+  "Config": {
+    "LogLevel": "Trace"
+  }
+}

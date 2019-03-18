@@ -1,0 +1,23 @@
+﻿{
+  "DisplayName": "ItemPickup",
+  "Author": "A Baked Potato",
+  "Version": "1.0.0",
+  "Enable": true,
+  "Config": {
+    "LogLevel": "Trace",
+
+    "PreferBagFirst": true,
+
+    "ItemIgnore": {
+      "MatchMethod": "exact",
+      "MatchMethod_comment": "possible values: exact, startswith, endswith, contains",
+      "Language": "English",
+      "Language_comment": "possible values: English, Chinese, German, T_Chinese, Italian, Spanish, Japanese, Russian",
+      "Items": [
+        "Sand",
+        "Stone",
+        "Soil"
+      ]
+    }
+  }
+}
