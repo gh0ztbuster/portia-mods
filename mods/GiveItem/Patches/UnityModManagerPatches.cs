@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
 using Harmony;
+using Pathea;
 using Pathea.InputSolutionNs;
-using UnityEngine;
+using Pathea.ModuleNs;
+using Pathea.UISystemNs;
 using UnityModManagerNet;
 
 namespace GiveItem.Patches
 {
     [HarmonyPatch( typeof( UnityModManager.UI ) )]
     [HarmonyPatch( "BlockGameUI" )]
-    internal class UnityModManagerUIPatches
+    internal static class UnityModManagerUIPatches
     {
+        private static readonly BoolTrue trueLogic = new BoolTrue();
         private static bool? escMouse = null;
+        private static bool prevVis;
         
         private static void Postfix( bool value )
         {
@@ -18,17 +22,23 @@ namespace GiveItem.Patches
             {
                 if( escMouse == true )
                 {
-                    // restore mouse
-                    Pathea.ModuleNs.Module<InputSolutionModule>.Self?.Pop();
-                    GiveItem.Logger.Log( "Popped InputSolution" );
+                    // restore mouse, resume game
+                    GiveItem.Logger.Log( "Restoring mouse state, removing time pauser" );
+                    UIStateComm.Instance?.SetCursor( prevVis );
+                    Module<InputSolutionModule>.Self?.RemoverDisable( trueLogic );
+                    UIStateComm.Instance?.ResumeGame( trueLogic );
                     escMouse = false;
                 }
             }
             else
             {
-                // capture mouse
-                Pathea.ModuleNs.Module<InputSolutionModule>.Self?.Push( SolutionType.UIBase );
-                GiveItem.Logger.Log( "Pushed InputSolution" );
+                prevVis = UIStateComm.Instance?.cursorVisiable != false;
+
+                // capture mouse, pause game
+                GiveItem.Logger.Log( "Overriding mouse state, adding time pauser" );
+                UIStateComm.Instance?.SetCursor( true );
+                Module<InputSolutionModule>.Self?.AddDisable( trueLogic );
+                UIStateComm.Instance?.PauseGame( trueLogic );
                 escMouse = true;
             }
         }
