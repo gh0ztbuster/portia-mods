@@ -46,10 +46,13 @@ namespace GiveItem
                 GUILayout.Label( "Item Name: ", LblWidth );
 
                 bool submit = false;
-                if( ( Event.current.type == EventType.KeyDown          )
+                if( ( Event.current.type == EventType.KeyUp          )
                  && ( ( Event.current.keyCode == KeyCode.Return      )
                    || ( Event.current.keyCode == KeyCode.KeypadEnter ) ) )
+				{
+				    Event.current.Use();
                     submit = true;
+				}
 
                 name = GUILayout.TextField( name, GUILayout.Width( 200 ) );
                 if( GUILayout.Button( "Search", GUILayout.Width( 100 ) ) || submit )

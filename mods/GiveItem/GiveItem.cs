@@ -8,16 +8,13 @@ namespace GiveItem
 {
     public static class GiveItem
     {
-        #region Default Mod Properties
-        public static bool enabled = false;
-        public static UnityModManager.ModEntry.ModLogger Logger;
-        #endregion
+        public static UnityModManager.ModEntry.ModLogger Logger { get; private set; }
 
-        #region Default Mod Entry Points
         public static bool Load( UnityModManager.ModEntry modEntry )
         {
-            GiveItem.Logger = modEntry.Logger;
+            Logger = modEntry.Logger;
             modEntry.OnGUI = GiveItemGUI.OnGUI;
+            modEntry.OnToggle = OnToggle;
 
             HarmonyInstance harmony = HarmonyInstance.Create( modEntry.Info.Id );
             harmony.PatchAll( Assembly.GetExecutingAssembly() );
@@ -27,10 +24,12 @@ namespace GiveItem
 
         public static bool OnToggle( UnityModManager.ModEntry modEntry, bool value )
         {
-            GiveItem.enabled = value;
+            if( !value )
+                modEntry.OnGUI = null;
+            else
+                modEntry.OnGUI = GiveItemGUI.OnGUI;
 
             return true;
         }
-        #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Harmony;
 using Pathea;
+using Pathea.AudioNs;
 using Pathea.InputSolutionNs;
 using Pathea.ModuleNs;
 using Pathea.UISystemNs;
@@ -22,10 +23,12 @@ namespace GiveItem.Patches
             {
                 if( escMouse == true )
                 {
-                    // restore mouse, resume game
+                    // restore mouse, resume audio effects, resume game
                     GiveItem.Logger.Log( "Restoring mouse state, removing time pauser" );
                     UIStateComm.Instance?.SetCursor( prevVis );
                     Module<InputSolutionModule>.Self?.RemoverDisable( trueLogic );
+                    AudioPlayer.Self?.ResumeEffect2D();
+                    AudioPlayer.Self?.ResumeEffect3D();
                     UIStateComm.Instance?.ResumeGame( trueLogic );
                     escMouse = false;
                 }
@@ -34,10 +37,12 @@ namespace GiveItem.Patches
             {
                 prevVis = UIStateComm.Instance?.cursorVisiable != false;
 
-                // capture mouse, pause game
+                // capture mouse, pause audio effects, pause game
                 GiveItem.Logger.Log( "Overriding mouse state, adding time pauser" );
                 UIStateComm.Instance?.SetCursor( true );
                 Module<InputSolutionModule>.Self?.AddDisable( trueLogic );
+                AudioPlayer.Self?.PauseEffect2D();
+                AudioPlayer.Self?.PauseEffect3D();
                 UIStateComm.Instance?.PauseGame( trueLogic );
                 escMouse = true;
             }

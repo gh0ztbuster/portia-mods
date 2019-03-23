@@ -2,7 +2,7 @@
   "Id": "GiveItem",
   "DisplayName": "Give Item",
   "Author": "BakedPotat0",
-  "Version": "0.2.0",
+  "Version": "0.3.0",
   "ManagerVersion": "0.13.0.0",
   "EntryMethod": "GiveItem.GiveItem.Load",
   "HomePage": "https://github.com/1bakedpotato/portia-mods#user-content-giveitem",
