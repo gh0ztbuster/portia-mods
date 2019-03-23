@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using GiveItem.Patches;
 using Pathea;
+using Pathea.AudioNs;
+using Pathea.InputSolutionNs;
 using Pathea.ModuleNs;
 using Pathea.ScenarioNs;
+using Pathea.UISystemNs;
 using UnityModManagerNet;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace GiveItem
 {
@@ -140,6 +144,117 @@ namespace GiveItem
     //TODO: Remove the UMM's OnGui() logic above and replace with this.
     internal static class GiveItemGUI2
     {
+        public const string GUI_TXT_LABEL = "Enter Search Term";
 
+        public static bool CanBeActive { get; private set; } = true;
+        public static bool IsActive { get; private set; } = false;
+
+        private const int GUI_OPEN_SFX_ID = 68;
+        private static ColorConfigUI searchUI = null;
+        private static SearchUICfg searchUICfg;
+        private static GameObject lastSelect;
+
+        private static bool initGUI()
+        {
+            // if GUI is called too early, fail quietly
+            if( UIStateComm.Instance == null )
+                return false;
+
+            if( searchUI == null )
+                searchUI = GameUtils
+                            .AddChild( UIStateComm.Instance.UiRoot, "Prefabs/ColorConfigUI", AssetType.UiSystem )
+                            .GetComponent<ColorConfigUI>();
+
+            if( searchUI == null )
+            {
+                GiveItem.Logger.Error( "Can't instantiate a ColorConfigUI child, mod disabled" );
+                CanBeActive = false;
+                return false;
+            }
+
+            if( searchUICfg == null )
+            {
+                searchUICfg = new SearchUICfg();
+            }
+
+            return true;
+        }
+
+        public static void OpenGUI()
+        {
+            if( IsActive || !initGUI() )
+                return;
+
+            IsActive = true;
+            GiveItem.Logger.Log( "GiveItemGUI2.OpenGUI() !!!" );
+
+            lastSelect = EventSystem.current.currentSelectedGameObject;
+            Module<InputSolutionModule>.Self.Push( SolutionType.ColorConfig );
+            searchUICfg.SearchTerm = GUI_TXT_LABEL;
+            searchUI.gameObject.SetActive( true );
+            searchUI.SetTarget( searchUICfg, new Action( OnSearch ), false );
+            Module<AudioModule>.Self.PlayEffect2D( GUI_OPEN_SFX_ID, false, true, false );
+        }
+
+        public static void OnSearch()
+        {
+            Module<InputSolutionModule>.Self.Pop();
+            EventSystem.current.SetSelectedGameObject( lastSelect );
+
+            if( searchUICfg.SearchTerm == GUI_TXT_LABEL )
+            {
+                GiveItem.Logger.Log( "User canceled search" );
+                CloseGUI();
+                return;
+            }
+
+            GiveItem.Logger.Log( $"User searched for: \"{searchUICfg.SearchTerm}\"" );
+            CloseGUI();
+        }
+
+        public static void CloseGUI()
+        {
+            if( !IsActive )
+                return;
+
+            IsActive = false;
+            searchUI.gameObject.SetActive( false );
+
+            if( searchUI.enabled )
+            {
+                GiveItem.Logger.Log( "User is closing GUI, cancel search UI" );
+            }
+            else
+                GiveItem.Logger.Log( "User is closing GUI, search UI already disabled" );
+        }
+
+        sealed class SearchUICfg : IColorConfig
+        {
+            public string SearchTerm { get; set; }
+
+            bool IColorConfig.HasNameEdit => true;
+
+            Color IColorConfig.GetColor( int index ) => Color.white;
+
+            int IColorConfig.GetColorCount() => 0;
+
+            int IColorConfig.GetDyeCost() => 0;
+
+            Renderer[] IColorConfig.GetExtraRenders() => null;
+
+            MatColorConfig IColorConfig.GetMatColorConfig( int index ) => null;
+
+            string IColorConfig.GetName() => this.SearchTerm;
+
+            Vector3 IColorConfig.GetPreviewScale() => Vector3.one;
+
+            Renderer IColorConfig.GetRender() => (Renderer)null;
+
+            void IColorConfig.ResetSetting() {}
+
+            void IColorConfig.SetColor(Color color, int index) {}
+
+            void IColorConfig.SetName( string name ) => this.SearchTerm = name;
+        }
     }
 }

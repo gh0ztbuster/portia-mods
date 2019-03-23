@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="GiveItem.cs" />
     <Compile Include="GiveItemGUI.cs" />
+    <Compile Include="Patches\InputFieldForMultiPlatformPatches.cs" />
     <Compile Include="Patches\UnityModManagerPatches.cs" />
     <Compile Include="Patches\ItemDataMgrPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
